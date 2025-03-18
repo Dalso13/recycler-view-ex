@@ -1,32 +1,39 @@
 package com.jdw.listview_second
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val list = mutableListOf<String>(
-            "1",
-            "2",
-            "3",
+        val list = mutableListOf<ListViewModel>(
+            ListViewModel("1"),
+            ListViewModel("2"),
+            ListViewModel("3"),
         )
 
         val adapter = ListViewAdapter(list)
 
-        val listview = findViewById<ListView>(R.id.mainListview)
+        val rv = findViewById<RecyclerView>(R.id.rv)
 
-        listview.adapter = adapter
+        rv.adapter = adapter
 
-        listview.setOnItemClickListener { parent, view, position, id ->
-            Toast.makeText(this, list[position], Toast.LENGTH_LONG).show()
+        rv.layoutManager = LinearLayoutManager(this)
+
+        adapter.itemClick = object : ListViewAdapter.ItemClick {
+            override fun onClick(view: View, position: Int) {
+                Toast.makeText(baseContext, list[position].text, Toast.LENGTH_LONG).show()
+            }
         }
 
     }

@@ -3,41 +3,47 @@ package com.jdw.listview_second
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
-class ListViewAdapter(val list: MutableList<String>): BaseAdapter() {
-    override fun getCount(): Int {
-        return list.size
+class ListViewAdapter(val items: MutableList<ListViewModel>): RecyclerView.Adapter<ListViewAdapter.ViewHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ListViewAdapter.ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.listview_item, parent, false)
+
+        return ViewHolder(view)
+    }
+    // 전체 리사이클러뷰의 갯수
+    override fun getItemCount(): Int {
+        return items.size
     }
 
-    override fun getItem(position: Int): Any? {
-        return list[position]
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        fun bindItems(item : ListViewModel) {
+            val rvText = itemView.findViewById<TextView>(R.id.listviewItem)
+
+            rvText.text = item.text
+        }
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
+    interface  ItemClick {
+        fun onClick(view: View, position: Int)
     }
+    var itemClick : ItemClick? = null
 
-    override fun getView(
-        position: Int,
-        convertView: View?,
-        parent: ViewGroup?
-    ): View? {
-        var converView = convertView
+    // viewbinding 작업 수행
+    override fun onBindViewHolder(holder: ListViewAdapter.ViewHolder, position: Int) {
 
-        if (converView == null) {
-            // 리스트뷰 아이템 가져오기
-            converView = LayoutInflater.from(parent?.context).inflate(R.layout.listview_item, parent, false)
+        if(itemClick != null) {
+            holder.itemView.setOnClickListener {
+                v -> itemClick?.onClick(v, position)
+            }
         }
 
-        // 리스트에 내용 텍스트뷰에 적용
-        val title = converView!!.findViewById<TextView>(R.id.listviewItem)
-        title.text = list[position]
-
-
-
-        // 리스트뷰아이템이 담긴 객체 리턴
-        return converView!!
+        holder.bindItems(items[position])
     }
+
 }
